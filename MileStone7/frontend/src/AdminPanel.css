@@ -1,0 +1,141 @@
+.admin-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .add-rule-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .add-rule-form input,
+  .add-rule-form select {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .add-rule-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-rule-form button:hover {
+    background: #0056b3;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  th {
+    background: #007bff;
+    color: white;
+  }
+  
+  td {
+    background: white;
+    color:black
+  }
+  
+  button {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  button:hover {
+    opacity: 0.8;
+  }
+  
+  .back-button {
+    margin-top: 20px;
+  }
+  
+  .back-button button {
+    background: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  
+  .back-button button:hover {
+    background: #218838;
+  }
+  
+  td {
+    color: black 
+  }
+  .file-routing-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .file-routing-form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .file-routing-form input,
+  .file-routing-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .file-routing-form select {
+    background-color: #f9f9f9;
+  }
+  
+  .file-routing-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+  
+  .file-routing-form button:hover {
+    background-color: #0056b3;
+  }
+  
