@@ -22,6 +22,51 @@ def connect_db():
         logger.error(f"Database connection error: {e}")
         return None
 
+# Function to check if prompt matches any regex pattern
+def match_prompt_with_policy(model, prompt):
+    conn = connect_db()
+    if conn is None:
+        logger.error("Database connection failed during regex match check")
+        return None, None
+
+    try:
+        cur = conn.cursor()
+        query = "SELECT regex_pattern, redirect_model FROM routing_policies WHERE model_name = %s;"
+        cur.execute(query, (model,))
+        policies = cur.fetchall()
+        logger.debug(f"Retrieved routing policies for model {model}: {policies}")
+
+        # Check each policy if the prompt matches
+        for policy in policies:
+            regex_pattern = policy[0]
+            redirect_model = policy[1]
+            logger.debug(f"Checking prompt: {prompt} against regex pattern: {regex_pattern}")
+            
+            if re.search(regex_pattern, prompt):
+                logger.debug(f"Prompt matched regex pattern: {regex_pattern}")
+                
+                # Fetch all models that match the redirect_model
+                provider_query = "SELECT name FROM models;"
+                cur.execute(provider_query)
+                models = cur.fetchall()
+
+                # Loop through all models and find the matching one
+                for model_name in models:
+                    model_name = model_name[0]
+                    logger.debug(f"Checking model: {model_name}")
+                    if redirect_model in model_name:
+                        provider = model_name.split("/")[0]  # Extract provider from model name
+                        logger.debug(f"Redirecting to model: {redirect_model} with provider: {provider}")
+                        return redirect_model, provider  # Return redirect model and its provider
+                        
+        logger.debug("No matching routing policy found.")
+        return None, None  # No match found
+    except psycopg2.Error as e:
+        logger.error(f"Error checking regex match: {e}")
+        return None, None
+    finally:
+        conn.close()
+
 # Function to validate the provider and model
 def validate_provider_and_model(provider, model):
     conn = connect_db()
@@ -32,7 +77,7 @@ def validate_provider_and_model(provider, model):
     try:
         cur = conn.cursor()
         query = "SELECT name FROM models WHERE name = %s;"
-        cur.execute(query, (model,))
+        cur.execute(query, (f"{provider}/{model}",))
         result = cur.fetchone()
         logger.debug(f"Validation query: {query} | Result: {result}")
         cur.close()
@@ -40,35 +85,6 @@ def validate_provider_and_model(provider, model):
     except psycopg2.Error as e:
         logger.error(f"Error validating provider/model: {e}")
         return False
-    finally:
-        conn.close()
-
-# Function to check if prompt matches any regex pattern
-def match_prompt_with_policy(model, prompt):
-    conn = connect_db()
-    if conn is None:
-        logger.error("Database connection failed during regex match check")
-        return None
-
-    try:
-        cur = conn.cursor()
-        query = "SELECT regex_pattern, redirect_model FROM routing_policies WHERE model_name = %s;"
-        cur.execute(query, (model,))
-        policies = cur.fetchall()
-        logger.debug(f"Retrieved routing policies for model {model}: {policies}")
-        
-        # Check each policy if the prompt matches
-        for policy in policies:
-            regex_pattern = policy[0]
-            redirect_model = policy[1]
-            if re.search(regex_pattern, prompt):
-                logger.debug(f"Prompt matched regex pattern: {regex_pattern}")
-                return redirect_model
-        
-        return None  # No match found
-    except psycopg2.Error as e:
-        logger.error(f"Error checking regex match: {e}")
-        return None
     finally:
         conn.close()
 
@@ -119,16 +135,18 @@ def chat_completions():
             logger.warning("Missing required parameters")
             return jsonify({"error": "Missing required parameters"}), 400
         
-        # Validate provider and model
-        if not validate_provider_and_model(provider, model):
-            logger.warning(f"Invalid provider/model combination: {provider}/{model}")
-            return jsonify({"error": "Invalid provider/model combination"}), 400
-        
         # Check if prompt matches any routing policies
-        redirect_model = match_prompt_with_policy(model, prompt)
+        redirect_model, redirect_provider = match_prompt_with_policy(model, prompt)
+        
         if redirect_model:
             logger.info(f"Prompt matched a regex pattern. Redirecting request to model: {redirect_model}")
             model = redirect_model  # Reroute to the new model
+            provider = redirect_provider
+            
+        # Now validate the provider and model after rerouting
+        if not validate_provider_and_model(provider, model):
+            logger.warning(f"Invalid provider/model combination: {provider}/{model}")
+            return jsonify({"error": "Invalid provider/model combination"}), 400
         
         # Get provider's response
         response = get_provider_response(provider, model, prompt)
@@ -144,4 +162,4 @@ def chat_completions():
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5002)
