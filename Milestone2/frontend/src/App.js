@@ -1,10 +1,12 @@
-import ModelsList from "./ModelsList";
+
+import './App.css'; 
+import ChatComponent from "./ChatComponent";
 
 function App() {
   return (
     <div>
-      <h1>MileStone 1 : Models Endpoint</h1>
-      <ModelsList />
+      <h1 className="heading">MileStone 2 : Chat Completions Endpoint </h1>
+      <ChatComponent />
     </div>
   );
 }
