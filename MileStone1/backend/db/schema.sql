@@ -1,5 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE models (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL
+    name TEXT UNIQUE NOT NULL
 );
