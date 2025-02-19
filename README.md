@@ -8,6 +8,71 @@ Frontend: React
 Backend: Flask
 Database: PostgreSQL
 
+Setup Instructions
+
+# Prerequisites
+Ensure you have the following installed:
+
+Python 3.x
+Node.js & npm
+PostgreSQL
+pip (Python package manager)
+Backend Setup (Flask)
+
+# Clone the repository:
+
+git clone https://github.com/Praneetha-NM/Unbound_hackathon.git
+cd Unbound_hackathon/backend
+
+# Create a virtual environment:
+
+python -m venv venv
+source venv/bin/activate  # For macOS/Linux
+venv\Scripts\activate  # For Windows
+
+# Install dependencies:
+
+pip install -r requirements.txt
+
+# Configure database in .env:
+
+DATABASE_URL=postgresql://username:password@localhost:5432/unbound_db
+
+# Frontend Setup (React)
+
+# Navigate to the frontend directory:
+ 
+cd ../frontend
+ 
+# Install dependencies:
+
+npm install  
+npm install axios react-router-dom react-do  
+
+# Start the React development server:
+
+npm start  
+
+# Usage Details
+
+1. Fetching Available Models
+API: GET /models
+Displays supported models in the chat UI.
+
+2. Sending a Chat Prompt
+API: POST /v1/chat/completions
+Routes the request to the appropriate provider.
+Applies regex rules before finalizing the model.
+
+3. Admin Panel for Regex Rules
+Admins can add, edit, delete regex routing rules.
+Updates stored policies in the database.
+
+4. File Upload & Special Routing
+Users can upload PDFs.
+Backend determines the provider for file processing based on admin settings.
+
+
 # Milestones & Implementations
 
  # Milestone 1: Models Endpoint
