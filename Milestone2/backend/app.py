@@ -48,17 +48,17 @@ def get_provider_response(provider, model, prompt):
         "openai": lambda prompt: {
             "provider": "openai",
             "model": "gpt-3.5",
-            "response": f"OpenAI: Processed your prompt with advanced language understanding."
+            "response": f"OpenAI: Processed your prompt with advanced language understanding. \n Response ID: openai_response_001"
         },
-        "anthropic": lambda prompt: {
+        "anthropic": lambda prompt: { 
             "provider": "anthropic",
             "model": "claude-v1",
-            "response": f"Anthropic: Your prompt has been interpreted with ethical AI principles."
+            "response": f"Anthropic: Your prompt has been interpreted with ethical AI principles. \n Response ID: anthropic_response_002"
         },
         "gemini": lambda prompt: {
             "provider": "gemini",
             "model": "gemini-alpha",
-            "response": f"Gemini: Your prompt has been processed with cutting-edge AI capabilities."
+            "response": f"Gemini: Your prompt has been processed with cutting-edge AI capabilities. \n Response ID: gemini_response_003"
         }
     }
 
