@@ -22,6 +22,8 @@ def connect_db():
         logger.error(f"Database connection error: {e}")
         return None
 
+
+    
 # Function to get available models and providers
 @app.route('/models', methods=['GET'])
 def get_models():
@@ -68,7 +70,6 @@ def get_models():
     finally:
         if conn:
             conn.close()
-
 # Function to check if prompt matches any regex pattern
 def match_prompt_with_policy(model, prompt):
     conn = connect_db()
@@ -169,10 +170,10 @@ def get_provider_response(provider, model, prompt):
 def chat_completions():
     try:
         # Parse the JSON request body
-        data = request.get_json()
-        provider = data.get("provider")
-        model = data.get("model")
-        prompt = data.get("prompt")
+        provider = request.form.get("provider")
+        model = request.form.get("model")
+        prompt = request.form.get("prompt")
+        file = request.files.get("file") 
 
         # Log the incoming request
         logger.debug(f"Request received: provider={provider}, model={model}, prompt={prompt}")
@@ -197,11 +198,18 @@ def chat_completions():
         
         # Get provider's response
         response = get_provider_response(provider, model, prompt)
-
+       
         if response is None:
             logger.warning("No response generated")
             return jsonify({"error": "Unsupported provider/model combination"}), 400
-        
+        # Append "File Processed" to the response
+        if isinstance(response, dict):
+            response["File Processed"] = True
+        elif isinstance(response, list):
+            response.append("File Processed")
+        else:
+            response = {"response": response, "File Processed": True}
+
         return jsonify(response)
 
     except Exception as e:
@@ -289,4 +297,4 @@ def delete_regex_rule(rule_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5004)
+    app.run(debug=True, port=5005)
