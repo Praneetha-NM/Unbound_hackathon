@@ -5,12 +5,15 @@ This project implements a lightweight chat UI integrated with a secure backend s
 # Tech Stack
 
 Frontend: React
+
 Backend: Flask
+
 Database: PostgreSQL
 
-Setup Instructions
+# Setup Instructions
 
 # Prerequisites
+
 Ensure you have the following installed:
 
 Python 3.x
