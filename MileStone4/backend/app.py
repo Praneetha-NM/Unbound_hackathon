@@ -32,7 +32,11 @@ def get_models():
             return jsonify({"error": "Database connection failed"}), 500
 
         cur = conn.cursor()
-        query = "SELECT name FROM models;"  # Adjust according to your schema
+
+        # Query to fetch all models from the models table
+        query = """
+            SELECT name FROM models;
+        """
         cur.execute(query)
         models = cur.fetchall()
 
@@ -40,10 +44,27 @@ def get_models():
             logger.info("No models found")
             return jsonify({"error": "No models found"}), 404
 
-        # Build a list of models with their providers
-        models_list = [{"provider": model[0].split('/')[0], "model": model[0].split('/')[1]} for model in models]
+        # Query to fetch models that are part of routing policies (model_name)
+        rerouted_query = """
+            SELECT model_name FROM routing_policies;
+        """
+        cur.execute(rerouted_query)
+        rerouted_models = cur.fetchall()
 
-        return jsonify(models_list)
+        # Prepare the result with provider and models (name[0] for provider, name[1] for model)
+        result = []
+
+        for model in models:
+            provider = model[0].split('/')[0]  # Extract provider from the name
+            model_name = model[0].split('/')[1]  # Extract model from the name
+            result.append({"provider": provider, "model": model_name})
+
+        # Add rerouted models to the list
+        for rerouted_model in rerouted_models:
+            result.append({"model": rerouted_model[0]})
+
+        return jsonify(result)
+    
     except Exception as e:
         logger.error(f"Error fetching models: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -75,8 +96,8 @@ def match_prompt_with_policy(model, prompt):
                 logger.debug(f"Prompt matched regex pattern: {regex_pattern}")
                 
                 # Fetch all models that match the redirect_model
-                provider_query = "SELECT name FROM models WHERE name LIKE %s;"
-                cur.execute(provider_query, (f"%{redirect_model}%",))
+                provider_query = "SELECT name FROM models;"
+                cur.execute(provider_query)
                 models = cur.fetchall()
 
                 # Loop through all models and find the matching one

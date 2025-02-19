@@ -1,0 +1,99 @@
+/* Chatcompletion.css */
+.chat-container {
+  width: 60%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f7f6;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+.chat-history {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 80%;
+}
+
+.user-message {
+  background-color: #e0f7fa;
+  align-self: flex-start;
+  margin-left: 10px;
+}
+
+.bot-message {
+  background-color: #f1f8e9;
+  align-self: flex-end;
+  margin-right: 10px;
+}
+
+.chat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+}
+
+.submit-btn {
+  padding: 12px;
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #0097a7;
+}
+
+.response-text {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.back-button {
+  margin-top: 20px;
+  align-items: center;
+}
+
+.back-button button {
+  background: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.back-button button:hover {
+  background: #218838;
+}

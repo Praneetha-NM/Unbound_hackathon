@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 import './Chatcompletion.css'; // Assuming you have a separate CSS file
 
@@ -11,13 +12,16 @@ function ChatCompletion() {
   const [response, setResponse] = useState("");
   const [messages, setMessages] = useState([]); // For chat history
 
+  const navigate = useNavigate(); // Initialize useNavigate
+
   // Fetch models from the /models endpoint
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const res = await axios.get("http://localhost:5003/models");
+        const res = await axios.get("http://localhost:5004/models");
         const availableModels = res.data; // Assuming the response is an array of model objects
         setModels(availableModels);
+
         // Extract providers from the models
         const uniqueProviders = [
           ...new Set(availableModels.map((model) => model.provider)),
@@ -43,7 +47,7 @@ function ChatCompletion() {
 
     try {
       // Send POST request
-      const res = await axios.post("http://localhost:5003/v1/chat/completions", {
+      const res = await axios.post("http://localhost:5004/v1/chat/completions", {
         provider: selectedProvider,
         model: selectedModel,
         prompt,
@@ -101,11 +105,11 @@ function ChatCompletion() {
             className="input-field"
           >
             <option value="">Select Model</option>
-              {models.map((model, index) => (
-            <option key={index} value={model.model}>
-              {model.model}
-            </option>
-          ))}
+            {models.map((model, index) => (
+              <option key={index} value={model.model}>
+                {model.model}
+              </option>
+            ))}
           </select>
         </div>
         <div className="input-group">
@@ -121,6 +125,11 @@ function ChatCompletion() {
         <button type="submit" className="submit-btn">Send</button>
       </form>
       {response && <p className="response-text"><strong>Response:</strong> {response}</p>}
+
+      {/* Admin Panel Button */}
+      <button className="back-button" onClick={() => navigate("/admin")}>
+        Go to Admin Panel
+      </button>
     </div>
   );
 }

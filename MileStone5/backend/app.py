@@ -22,6 +22,35 @@ def connect_db():
         logger.error(f"Database connection error: {e}")
         return None
 
+# Function to get available models and providers
+@app.route('/models', methods=['GET'])
+def get_models():
+    try:
+        conn = connect_db()
+        if conn is None:
+            logger.error("Database connection failed during model fetch")
+            return jsonify({"error": "Database connection failed"}), 500
+
+        cur = conn.cursor()
+        query = "SELECT name FROM models;"  # Adjust according to your schema
+        cur.execute(query)
+        models = cur.fetchall()
+
+        if not models:
+            logger.info("No models found")
+            return jsonify({"error": "No models found"}), 404
+
+        # Build a list of models with their providers
+        models_list = [{"provider": model[0].split('/')[0], "model": model[0].split('/')[1]} for model in models]
+
+        return jsonify(models_list)
+    except Exception as e:
+        logger.error(f"Error fetching models: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+    finally:
+        if conn:
+            conn.close()
+
 # Function to check if prompt matches any regex pattern
 def match_prompt_with_policy(model, prompt):
     conn = connect_db()
@@ -46,8 +75,8 @@ def match_prompt_with_policy(model, prompt):
                 logger.debug(f"Prompt matched regex pattern: {regex_pattern}")
                 
                 # Fetch all models that match the redirect_model
-                provider_query = "SELECT name FROM models;"
-                cur.execute(provider_query)
+                provider_query = "SELECT name FROM models WHERE name LIKE %s;"
+                cur.execute(provider_query, (f"%{redirect_model}%",))
                 models = cur.fetchall()
 
                 # Loop through all models and find the matching one
@@ -88,7 +117,7 @@ def validate_provider_and_model(provider, model):
     finally:
         conn.close()
 
-# Function to get the provider's response
+# Function to get provider's response
 def get_provider_response(provider, model, prompt):
     provider_stubs = {
         "openai": lambda prompt: {
@@ -160,6 +189,86 @@ def chat_completions():
     except Exception as e:
         logger.error(f"Error processing chat completion: {e}")
         return jsonify({"error": "Internal server error"}), 500
+    
+@app.route('/regex-rules', methods=['GET'])
+def get_regex_rules():
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT id, model_name, regex_pattern, redirect_model FROM routing_policies;")
+        rules = cursor.fetchall()
+        return jsonify(rules)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Add new regex rule (with validation)
+@app.route('/regex-rules', methods=['POST'])
+def add_regex_rule():
+    data = request.json
+    regex_pattern = data.get("pattern")
+    model_name = data.get("originalModel")
+    redirect_model = data.get("redirectModel")
+
+    if not regex_pattern or not model_name or not redirect_model:
+        return jsonify({"error": "All fields are required"}), 400
+
+    # Extract model name after '/'
+    redirect_name = redirect_model.split("/")[-1]  # Extract last part
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        # Check if redirect_model exists in models table
+        cursor.execute("SELECT name FROM models")
+        models= cursor.fetchall()
+
+        # Extract the second part after '/'
+        model_names = [name[0].split('/')[1] for name in models]
+
+        if redirect_model not in model_names:
+            return jsonify({"error": "Redirect model does not exist in models table"}), 400
+
+        # Insert into routing_policies table
+        cursor.execute(
+            "INSERT INTO routing_policies (model_name, regex_pattern, redirect_model) VALUES (%s, %s, %s) RETURNING id;",
+            (model_name, regex_pattern, redirect_model)
+        )
+        conn.commit()
+        return jsonify({"message": "Rule added successfully", "id": cursor.fetchone()[0]})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Delete regex rule
+@app.route('/regex-rules/<int:rule_id>', methods=['DELETE'])
+def delete_regex_rule(rule_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM routing_policies WHERE id = %s RETURNING id;", (rule_id,))
+        deleted_rule = cursor.fetchone()
+
+        if not deleted_rule:
+            return jsonify({"error": "Rule not found"}), 404
+
+        conn.commit()
+        return jsonify({"message": "Rule deleted successfully"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(debug=True, port=5004)
