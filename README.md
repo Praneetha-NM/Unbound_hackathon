@@ -2,6 +2,10 @@
 
 This project implements a lightweight chat UI integrated with a secure backend server that dynamically routes user prompts to different simulated language model providers based on regex-based policies.
 
+# Demo Video Link :
+
+https://www.loom.com/share/c791cd75d6c74b92883801c4f7732a0c?sid=5fc08f7d-5b3f-48d4-9541-42e6021543a4
+
 # Tech Stack
 
 Frontend: React
