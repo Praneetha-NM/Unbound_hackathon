@@ -41,7 +41,7 @@ def get_models():
             return jsonify({"error": "No models found"}), 404
 
         # Build a list of models with their providers
-        models_list = [{"provider": model[0].split('/')[0], "model": model[0]} for model in models]
+        models_list = [{"provider": model[0].split('/')[0], "model": model[0].split('/')[1]} for model in models]
 
         return jsonify(models_list)
     except Exception as e:
