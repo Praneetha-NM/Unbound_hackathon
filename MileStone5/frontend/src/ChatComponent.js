@@ -123,13 +123,14 @@ function ChatCompletion() {
           />
         </div>
         <button type="submit" className="submit-btn">Send</button>
+        <button className="adm-button" onClick={() => navigate("/admin")}>
+        Go to Admin Panel
+      </button>
       </form>
       {response && <p className="response-text"><strong>Response:</strong> {response}</p>}
 
       {/* Admin Panel Button */}
-      <button className="back-button" onClick={() => navigate("/admin")}>
-        Go to Admin Panel
-      </button>
+      
     </div>
   );
 }

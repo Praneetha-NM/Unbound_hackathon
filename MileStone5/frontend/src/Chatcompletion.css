@@ -82,18 +82,18 @@ h2 {
   border-radius: 8px;
   box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
-.back-button {
+.adm-button {
   margin-top: 20px;
   align-items: center;
 }
 
-.back-button button {
+.adm-button{
   background: #28a745;
   color: white;
   padding: 10px 15px;
   border-radius: 5px;
 }
 
-.back-button button:hover {
+.adm-button{
   background: #218838;
 }
